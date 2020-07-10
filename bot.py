@@ -48,8 +48,39 @@ status = [
 
 ]
 
+witchEmotes = [
+
+"<:witchFraud:729928591244263476>",
+"<:witchWtf:729928591382544436>",
+"<:witchWink:729928591399321632>",
+"<:witchlol:729928591399452674>",
+"<:witch:729928591420293151>",
+"<:witchPissed:729928591613231155>",
+"<:witchYay:729928591617294427>",
+"<:witchScream:729928591663562824>",
+"<:witchSmile:729928591743254608>",
+"<:witchSmug:729928591785328680>",
+"<:witchHmm:729928591881535521>",
+"<:witchShock:729928592430989316>",
+"<:witchYikes:729928592930373732>",
+"<:witchYes:729928592984637531>",
+"<:witchHurt:729928593462788107>",
+"<:witchThink:730491882916020315>"
+
+]
 
 client = discord.Client()
+
+@client.event
+async def on_ready():
+    print('Logged in as')
+    print(client.user.name)
+    print(client.user.id)
+    #await asyncTest()  
+
+    await client.change_presence(activity= discord.Game("Tax Fraud"))
+
+
 
 @client.event
 async def on_message(message):
@@ -57,7 +88,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    message_id = message.id
+    #message_id = message.id
     author = message.author
     channel = message.channel
     try:
@@ -82,11 +113,17 @@ async def on_message(message):
 
         if command == f'{PREFIX}stop':
             print('close connection')
-            await channel.send("O-hohohoho!")
+            await channel.send("I wasn't too tough, was I?")
             await client.close()
             #sys.exit()
+        
+        if command == f'{PREFIX}emotes':
+            for i in guild.emojis:
+                print(f"<:{i.name}:{i.id}")
+            return
     
-
+    if hasWord("witch"):
+        await message.add_reaction(choice(witchEmotes))
 
 
     if not message.content.startswith(PREFIX):
@@ -97,16 +134,16 @@ async def on_message(message):
         await channel.send('test')
         return
 
-@client.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    #await asyncTest()  
+    if command == ('emoji'):
+        if len(args) == 1:
+            #try:
+            await channel.send(witchEmotes[int(args[0])])
+            #except:
+            #    await channel.send("What a fool.")
+        return
 
-    await client.change_presence(activity= discord.Game("Tax Fraud"))
 
 async def statusChange():
-    await client.change_presence(activity= discord.Game(random.choice(status)))
+    await client.change_presence(activity= discord.Game(choice(status)))
 
 client.run(TOKEN)
