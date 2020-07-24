@@ -2,8 +2,12 @@ import sys
 import json
 import requests
 import discord
-from random import choice
+import asyncio
 
+from random import choice
+from threading import Timer
+
+import minigame
 
 with open('keys.json', 'r') as read_file:
     keys = json.load(read_file)
@@ -54,7 +58,7 @@ witchEmotes = [
 "<:witchWtf:729928591382544436>",
 "<:witchWink:729928591399321632>",
 "<:witchlol:729928591399452674>",
-"<:witch:729928591420293151>",
+"<:witchHappy:729928591420293151>",
 "<:witchPissed:729928591613231155>",
 "<:witchYay:729928591617294427>",
 "<:witchScream:729928591663562824>",
@@ -68,6 +72,16 @@ witchEmotes = [
 "<:witchThink:730491882916020315>"
 
 ]
+
+async def timerMessage(num, channel):
+    print(f"{num} second timer")
+    if num > 20:
+        await channel.send("Leave me alone.")
+        return
+    await asyncio.sleep(num)
+    await channel.send(f"{num} seconds have passed.")
+
+minigames = {}
 
 client = discord.Client()
 
@@ -107,13 +121,21 @@ async def on_message(message):
                 return True
         return False
     
+    if hasWord('@everyone', "@here"):
+        await message.add_reaction('<:witchPissed:729928591613231155>')
+        await message.add_reaction("💢")
+        await message.add_reaction("🏓")
+        return
+
+    
+
 
     #owner commands
     if author.id == OWNER:
 
         if command == f'{PREFIX}stop':
             print('close connection')
-            await channel.send("I wasn't too tough, was I?")
+            await channel.send("I apologize...")
             await client.close()
             #sys.exit()
         
@@ -125,6 +147,11 @@ async def on_message(message):
     if hasWord("witch"):
         await message.add_reaction(choice(witchEmotes))
 
+
+    if minigames.get(channel.id):
+        game = minigames.get(channel.id)
+        if game.validUser(author.id):
+            await game.process(splitString)
 
     if not message.content.startswith(PREFIX):
         return
@@ -141,6 +168,37 @@ async def on_message(message):
             #except:
             #    await channel.send("What a fool.")
         return
+    
+    if command == ('minigame'):
+        if minigames.get(channel.id):
+            await channel.send("A minigame is already in progress!")
+        else:
+            minigames[channel.id] = minigame.Minigame(channel,author.id)
+            await channel.send("Initializing " + minigames.get(channel.id).name)
+
+    if command == ('exit'):
+        if minigames.get(channel.id):
+            game = minigames.get(channel.id)
+            if game.validUser(author.id):
+                await channel.send("Exitting " + game.name)
+                minigames.pop(channel.id)
+            else:
+                await channel.send("You did not start the minigame.")
+        else:
+            await channel.send("No minigame in progress.")
+        return
+
+    if command == ('timer'):
+        if len(args) < 1:
+            await channel.send("What a fool.")
+        else:
+            try:
+                args = map(lambda x: int(x), args)
+                for num in args:
+                    await channel.send(f"Starting {num} second timer.")
+                    await timerMessage(num,channel)
+            except ValueError:
+                await channel.send("What a fool.")
 
 
 async def statusChange():
