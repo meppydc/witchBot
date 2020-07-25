@@ -21,6 +21,9 @@ class BullsAndCows(minigame.Minigame):
             return 2
         return 1
 
+    async def instruction(self):
+        await self.channel.send("Type in a 4 digit number.")
+
     async def output(self,bulls,cows):
         await self.channel.send(f"{bulls} bullus and {cows} cowards")
 
@@ -37,10 +40,12 @@ class BullsAndCows(minigame.Minigame):
                     else:
                         cows += 1
             self.guesses += 1
+            self.resetTimer()
             if bulls == 4:
                 await self.channel.send(f"The number was {self.secret}! You guessed it in {self.guesses} tries. I wasn't too tough, was I?")
                 self.finished = True
                 return
             await self.output(bulls,cows)
+            await self.instruction()
         elif inputCode == 2:
             await self.channel.send("You're useless!")
