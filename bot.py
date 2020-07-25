@@ -6,9 +6,12 @@ import asyncio
 
 from random import choice
 from threading import Timer
+from datetime import timedelta
 
 from Minigames import minigame
 from Minigames import bullsandcows
+
+import util
 
 with open('keys.json', 'r') as read_file:
     keys = json.load(read_file)
@@ -76,7 +79,7 @@ witchEmotes = [
 
 async def timerMessage(num, channel):
     print(f"{num} second timer")
-    if num > 20:
+    if num > 120:
         await channel.send("Leave me alone.")
         return
     await asyncio.sleep(num)
@@ -137,6 +140,11 @@ async def on_message(message):
         if command == f'{PREFIX}stop':
             print('close connection')
             await channel.send("I apologize...")
+            
+            for game in minigames.values():
+                game.timer.cancel()
+            print("cancel timers?")
+
             await client.close()
             #sys.exit()
         
@@ -149,7 +157,7 @@ async def on_message(message):
         await message.add_reaction(choice(witchEmotes))
 
 
-    if minigames.get(channel.id) and not minigames.get(channel.id).finished :
+    if minigames.get(channel.id) and not minigames.get(channel.id).finished:
         game = minigames.get(channel.id)
         if game.validUser(author.id):
             await game.process(message.content)
@@ -176,6 +184,7 @@ async def on_message(message):
         else:
             minigames[channel.id] = minigame.Minigame(channel,author.id)
             await channel.send("Initializing " + minigames.get(channel.id).name)
+            await minigames.get(channel.id).instruction()
 
     if command == ('bullu') or command == ('bullus'):
         if minigames.get(channel.id) and not minigames.get(channel.id).finished:
@@ -183,7 +192,7 @@ async def on_message(message):
         else:
             minigames[channel.id] = bullsandcows.BullsAndCows(channel,author.id)
             await channel.send("Initializing " + minigames.get(channel.id).name)
-            await channel.send("")
+            await minigames.get(channel.id).instruction()
    
     if command == ('exit'):
         if minigames.get(channel.id):
