@@ -7,7 +7,8 @@ import asyncio
 from random import choice
 from threading import Timer
 
-import minigame
+from Minigames import minigame
+from Minigames import bullsandcows
 
 with open('keys.json', 'r') as read_file:
     keys = json.load(read_file)
@@ -148,10 +149,10 @@ async def on_message(message):
         await message.add_reaction(choice(witchEmotes))
 
 
-    if minigames.get(channel.id):
+    if minigames.get(channel.id) and not minigames.get(channel.id).finished :
         game = minigames.get(channel.id)
         if game.validUser(author.id):
-            await game.process(splitString)
+            await game.process(message.content)
 
     if not message.content.startswith(PREFIX):
         return
@@ -170,12 +171,20 @@ async def on_message(message):
         return
     
     if command == ('minigame'):
-        if minigames.get(channel.id):
+        if minigames.get(channel.id) and not minigames.get(channel.id).finished:
             await channel.send("A minigame is already in progress!")
         else:
             minigames[channel.id] = minigame.Minigame(channel,author.id)
             await channel.send("Initializing " + minigames.get(channel.id).name)
 
+    if command == ('bullu') or command == ('bullus'):
+        if minigames.get(channel.id) and not minigames.get(channel.id).finished:
+            await channel.send("A minigame is already in progress!")
+        else:
+            minigames[channel.id] = bullsandcows.BullsAndCows(channel,author.id)
+            await channel.send("Initializing " + minigames.get(channel.id).name)
+            await channel.send("")
+   
     if command == ('exit'):
         if minigames.get(channel.id):
             game = minigames.get(channel.id)
