@@ -7,11 +7,13 @@ import asyncio
 from random import choice
 from threading import Timer
 from datetime import timedelta
-
-from Minigames import minigame
-from Minigames import bullsandcows
+from functools import reduce
 
 import util
+from Minigames import minigame
+from Minigames import bullsandcows
+from help import commands
+from help import helpMessages
 
 with open('keys.json', 'r') as read_file:
     keys = json.load(read_file)
@@ -73,7 +75,8 @@ witchEmotes = [
 "<:witchYikes:729928592930373732>",
 "<:witchYes:729928592984637531>",
 "<:witchHurt:729928593462788107>",
-"<:witchThink:730491882916020315>"
+"<:witchThink:730491882916020315>",
+"<:witchYo:737424596831305748>"
 
 ]
 
@@ -152,7 +155,12 @@ async def on_message(message):
             for i in guild.emojis:
                 print(f"<:{i.name}:{i.id}")
             return
-    
+
+        if command == f'{PREFIX}content':
+            print(message.content)
+            await channel.send(message.content[10:])
+
+
     if hasWord("witch"):
         await message.add_reaction(choice(witchEmotes))
 
@@ -161,13 +169,48 @@ async def on_message(message):
         game = minigames.get(channel.id)
         if game.validUser(author.id):
             await game.process(message.content)
+            if game.finished:
+                minigames.pop(channel.id)
+        return
 
     if not message.content.startswith(PREFIX):
         return
     command = command[PLEN:]
 
-    if command == ('test'):
-        await channel.send('test')
+    if command == ('help') or command == ('h'):
+        await statusChange()
+        if len(args) < 1:
+            count = len(commands)
+            commandNames = list(commands.keys())
+            num1 = num2 = int(count/3)
+            #scuffed af
+            if count % 3 == 1:
+                num1 += 1
+            elif count % 3 == 2:
+                num1 += 1
+                num2 += 1
+
+            col1 = commandNames[0:num1]
+            col2 = commandNames[num1:num1+num2]
+            col3 = commandNames[num1+num2:count]
+            fields = [
+                ("\u200b",reduce(lambda x,y: x + f"`{y}`\n", col1, ""),True),
+                ("\u200b",reduce(lambda x,y: x + f"`{y}`\n", col2, ""),True),
+                ("\u200b",reduce(lambda x,y: x + f"`{y}`\n", col3, ""),True)
+
+
+            ]
+            embed = util.created_embed(
+                title="Commands",
+                description=f"Do `{PREFIX}help <command>` to learn more about it",
+                fields=fields)
+            await channel.send(embed = embed)
+
+        else:
+            try:
+                await channel.send(embed = commands[args[0]].info())
+            except AttributeError:
+                await channel.send(random.choice(helpMessages))
         return
 
     if command == ('emoji'):
@@ -200,6 +243,8 @@ async def on_message(message):
             if game.validUser(author.id):
                 await channel.send("Exitting " + game.name)
                 minigames.pop(channel.id)
+            elif game.finished:
+                await channel.send("Minigame is inactive. Start a new one.")
             else:
                 await channel.send("You did not start the minigame.")
         else:
@@ -217,6 +262,19 @@ async def on_message(message):
                     await timerMessage(num,channel)
             except ValueError:
                 await channel.send("What a fool.")
+
+    if command == ('embed'):
+        await channel.send(embed=util.created_embed(
+            title="embed",
+            url="https://leovoel.github.io/embed-visualizer/",
+            thumbnail="https://cdn.discordapp.com/emojis/729928591617294427.png",
+            description="[embed](https://leovoel.github.io/embed-visualizer/) testing",
+            fields=[("hey","you",True),("pepega","peg",True)]
+            ))
+
+    if command == ('test'):
+        await channel.send('test')
+        return
 
 
 async def statusChange():
