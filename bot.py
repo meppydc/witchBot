@@ -9,7 +9,7 @@ from threading import Timer
 from datetime import timedelta
 from functools import reduce
 
-import util
+from Util import util
 from Minigames import minigame
 from Minigames import bullsandcows
 from help import commands
@@ -76,7 +76,8 @@ witchEmotes = [
 "<:witchYes:729928592984637531>",
 "<:witchHurt:729928593462788107>",
 "<:witchThink:730491882916020315>",
-"<:witchYo:737424596831305748>"
+"<:witchYo:737424596831305748>",
+"<:witchBlush:740623473436655708>"
 
 ]
 
