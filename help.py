@@ -1,4 +1,4 @@
-import util
+from Util import util
 import json
 with open('keys.json', 'r') as read_file:
     PREFIX = json.load(read_file)['PREFIX']
