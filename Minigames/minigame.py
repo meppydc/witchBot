@@ -1,6 +1,6 @@
 import discord
 import asyncio
-import util
+from Util import util
 
 from threading import Timer
 
