@@ -5,7 +5,7 @@ def file_to_array(name):
     result = file.readlines()
     file.close()
     print(f"Read array {name}")
-    return result
+    return [line[:-2] for line in result]
 
 def array_to_file(name, a):
     file = open(name,"w")
