@@ -10,6 +10,7 @@ from datetime import timedelta
 from functools import reduce
 
 from Util import util
+from Util import file_manager
 from Minigames import minigame
 from Minigames import bullsandcows
 from help import commands
@@ -25,61 +26,9 @@ with open('keys.json', 'r') as read_file:
 
 
 
-status = [
+status = file_manager.file_to_array('Const/status.txt')
+witchEmotes = file_manager.file_to_array('Const/witch_emotes.txt')
 
-"Puyo Puyo (1992)",
-"Puyo Puyo Tsu",
-"Puyo Puyo Box",
-"Puyo Puyo Sun",
-"Puyo Puyo~n",
-"Minna de Puyo Puyo",
-"Puyo Puyo 7",
-"Puyo Puyo!! 20th Anniversary",
-"Puyo Puyo Tetris",
-"Puyo Puyo Chronicle",
-"Puyo Puyo eSports",
-
-"Madou Monogatari 3",
-"Madou Monogatari: ARS",
-"Madou Monogatari I (Mega Drive)",
-"Madou Monogatari (Saturn)",
-"Madou Monogatari: Hanamaru Dai Youchienji",
-"Madou Monogatari: Tower of the Magician",
-
-"Nazo Puyo: Arle's Roux",
-"Super Nazo Puyo: Rulue's Roux",
-"PuyoLympic",
-"Comet Summoner",
-"Puyo Puyo!! Quest",
-"Puyo Puyo!! Quest Arcade",
-"Puyo Puyo!! Touch",
-
-"Tax Fraud"
-
-]
-
-witchEmotes = [
-
-"<:witchFraud:729928591244263476>",
-"<:witchWtf:729928591382544436>",
-"<:witchWink:729928591399321632>",
-"<:witchlol:729928591399452674>",
-"<:witchHappy:729928591420293151>",
-"<:witchPissed:729928591613231155>",
-"<:witchYay:729928591617294427>",
-"<:witchScream:729928591663562824>",
-"<:witchSmile:729928591743254608>",
-"<:witchSmug:729928591785328680>",
-"<:witchHmm:729928591881535521>",
-"<:witchShock:729928592430989316>",
-"<:witchYikes:729928592930373732>",
-"<:witchYes:729928592984637531>",
-"<:witchHurt:729928593462788107>",
-"<:witchThink:730491882916020315>",
-"<:witchYo:737424596831305748>",
-"<:witchBlush:740623473436655708>"
-
-]
 
 async def timerMessage(num, channel):
     print(f"{num} second timer")
@@ -115,7 +64,6 @@ async def on_message(message):
     channel = message.channel
     try:
         guild = channel.guild
-        #conveniently doesn't allow commands to work in dms LOL
     except:
         pass
 
@@ -172,7 +120,7 @@ async def on_message(message):
             await game.process(message.content)
             if game.finished:
                 minigames.pop(channel.id)
-        return
+                return
 
     if not message.content.startswith(PREFIX):
         return
