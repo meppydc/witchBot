@@ -26,8 +26,8 @@ with open('keys.json', 'r') as read_file:
 
 
 
-status = file_manager.file_to_array('Const/status.txt')
-witchEmotes = file_manager.file_to_array('Const/witch_emotes.txt')
+status = file_manager.file_to_array('Const/status.txt',False)
+witchEmotes = file_manager.file_to_array('Const/witch_emotes.txt',False)
 
 
 async def timerMessage(num, channel):
@@ -95,7 +95,7 @@ async def on_message(message):
             
             for game in minigames.values():
                 game.timer.cancel()
-            print("cancel timers?")
+            print("cancel timers")
 
             await client.close()
             #sys.exit()
@@ -116,7 +116,7 @@ async def on_message(message):
 
     if minigames.get(channel.id) and not minigames.get(channel.id).finished:
         game = minigames.get(channel.id)
-        if game.validUser(author.id):
+        if game.validUser(author):
             await game.process(message.content)
             if game.finished:
                 minigames.pop(channel.id)
@@ -174,7 +174,7 @@ async def on_message(message):
         if minigames.get(channel.id) and not minigames.get(channel.id).finished:
             await channel.send("A minigame is already in progress!")
         else:
-            minigames[channel.id] = minigame.Minigame(channel,author.id)
+            minigames[channel.id] = minigame.Minigame(channel,author)
             await channel.send("Initializing " + minigames.get(channel.id).name)
             await minigames.get(channel.id).instruction()
 
