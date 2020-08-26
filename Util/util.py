@@ -11,6 +11,10 @@ def get_time():
 
 def compare_time(time1, time2, change):
     delta = time2 - time1
+    
+    if change == 0:
+        return delta.total_seconds()
+    
     if delta > change:
         return 0
     else:
