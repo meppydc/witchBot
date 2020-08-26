@@ -1,11 +1,11 @@
 from functools import reduce
 
-def file_to_array(name):
+def file_to_array(name, keep_new_line):
     file = open(name,"r")
     result = file.readlines()
     file.close()
     print(f"Read array {name}")
-    return [line[:-2] for line in result]
+    return result if keep_new_line else [line[:-2] for line in result]
 
 def array_to_file(name, a):
     file = open(name,"w")
