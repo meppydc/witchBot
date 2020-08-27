@@ -5,11 +5,11 @@ def file_to_array(name, keep_new_line):
     result = file.readlines()
     file.close()
     print(f"Read array {name}")
-    return result if keep_new_line else [line[:-2] for line in result]
+    return result if keep_new_line else [line[:-1] for line in result]
 
-def array_to_file(name, a):
+def array_to_file(name, a, add_new_line):
     file = open(name,"w")
-    file.writelines(a)
+    file.writelines([str(line) + "\n" if add_new_line else str(line) for line in a])
     file.close()
     print(f"Wrote array to {name}")
 
