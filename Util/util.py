@@ -20,6 +20,61 @@ def compare_time(time1, time2, change):
     else:
         return delta.total_seconds()
 
+def secsFormat(secs):
+    time = ""
+    suffix = ""
+    seconds = secs
+    decimals = seconds - seconds // 1
+    seconds -= decimals
+
+    days = seconds // (24*60*60)
+    seconds -= days*24*60*60
+    hours = seconds // (60*60)
+    seconds -= hours*60*60
+    minutes = seconds // 60
+    seconds -= minutes*60
+    #left with days hours minute seconds
+
+    if days == 1: time += "1 day"
+    elif days: time += f"{days} days"
+    if days and (hours or minutes or seconds or decimals): 
+        time += ", "
+
+    if hours:#day and hour
+        time += f"{hours}:"
+        suffix = " hrs" if hours != 1 else " hr"
+    
+    if minutes:
+        if not hours:
+            time += f"{minutes}:"
+            suffix = " min"
+        else:
+            time += f"{twoDigit(minutes)}:"
+    elif hours and not minutes:
+        time += "00:"
+
+    if seconds:
+        if not (hours or minutes): 
+            time += str(seconds)
+            suffix = " sec"
+        else:
+            time += f"{twoDigit(seconds)}"
+    elif (hours or minutes) and not seconds:
+        time += "00"
+    #if float is inputted get rid of decimals
+    time = time.replace('.0','')
+
+    if decimals:
+        time += '{:.3}'.format(decimals)[1:]
+    elif not (hours or minutes or seconds) and decimals:
+        time += '{:.3}'.format(decimals)
+        suffix = " sec"
+    #print(f"{days},{hours}:{minutes}:{seconds}")
+    return (time + suffix) or 0
+
+def decRound(num,n):
+    return '%.0f'.replace("0",str(n))%(num)
+
 
 pfp = "https://cdn.discordapp.com/emojis/729928591399321632.png"
 
